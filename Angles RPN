@@ -1,0 +1,152 @@
+def main():
+    angles = []
+    user_input = ''
+    while user_input.upper() != 'E':
+        user_input = input(": ")
+        if user_input == "":
+            angles.append(angles[-1])
+            for i in angles:
+                degrees, minutes_seconds = i.split(".")
+                degrees = int(degrees)
+                minutes = minutes_seconds[:2]
+                seconds = minutes_seconds[2:]
+                print(f": {str(degrees).zfill(2)}\u00B0{str(minutes).zfill(2)}'{str(seconds).zfill(2)}\" ")
+        else:
+            try:
+                float(user_input)
+                angle = user_input
+                if '.' in angle:
+                    deg, min_sec = angle.split(".")
+                    if int(deg) <= 360:
+                        if len(min_sec) < 1:
+                            deg = int(deg)
+                            degrees = str(deg)
+                            minutes = "00"
+                            seconds = "00"
+                        elif len(min_sec) == 1:
+                            print("Enter two digits for minutes and seconds ddd.mmss")
+                            continue
+                        elif len(min_sec) == 2:
+                            degrees = deg
+                            minutes = min_sec[:2]
+                            seconds = "00"
+                        elif len(min_sec) == 3:
+                            print("Enter two digits for seconds ddd.mmss")
+                            continue
+                        elif len(min_sec) == 4:
+                            degrees = deg
+                            minutes = min_sec[:2]
+                            seconds = min_sec[2:]
+                            if int(minutes) < 60:
+                                if int(seconds) < 60:
+                                    degrees = deg
+                                    minutes = min_sec[:2]
+                                    seconds = min_sec[2:]
+                                else:
+                                    print("seconds > 60")
+                                    continue
+                            else:
+                                print("minutes > 60")
+                                continue
+                        else:
+                            print("angle cannot have decimal seconds. ")
+                            continue
+                    else:
+                        print("angle > 360")
+                        continue
+                else:
+                    if int(angle) < 360:
+                        degrees = str(angle)
+                        minutes = "00"
+                        seconds = "00"
+                    else:
+                        print("Angle cannot be more than 360 degrees")
+                        continue
+                angle = degrees + "." + minutes + seconds
+                angles.append(angle)
+                for i in angles:
+                    degrees, minutes_seconds = i.split(".")
+                    degrees = int(degrees)
+                    minutes = minutes_seconds[:2]
+                    seconds = minutes_seconds[2:]
+                    print(f": {str(degrees).zfill(2)}\u00B0{str(minutes).zfill(2)}'{str(seconds).zfill(2)}\" ")
+
+            # when input cannot be converted to float execute the addition and subtraction
+            except ValueError:
+                valid_inputs = ["+", "S", "-"]
+                if user_input.upper() in valid_inputs:
+                    if user_input.upper() == "+":
+                        first_bottom_stack = str(angles[-1])
+                        second_bottom_stack = str(angles[-2])
+                        addition = add_dms(dms_to_decimal, first_bottom_stack, second_bottom_stack)
+                        degrees, minutes, seconds = decimal_to_dms(addition)
+                        total_angle = f"{str(degrees)}.{str(minutes).zfill(2)}{str(seconds).zfill(2)}"
+                        angles.pop()
+                        angles.pop()
+                        angles.append(total_angle)
+                        for i in angles:
+                            degrees, minutes_seconds = i.split(".")
+                            degrees = int(degrees)
+                            minutes = minutes_seconds[:2]
+                            seconds = minutes_seconds[2:]
+                            print(f": {str(degrees).zfill(2)}\u00B0{str(minutes).zfill(2)}'{str(seconds).zfill(2)}\" ")
+                    elif user_input.upper() == "-":
+                        first_bottom_stack = str(angles[-1])
+                        second_bottom_stack = str(angles[-2])
+                        subtraction = subtract_dms(dms_to_decimal, first_bottom_stack, second_bottom_stack)
+                        degrees, minutes, seconds = decimal_to_dms(subtraction)
+                        total_angle = f"{str(degrees)}.{str(minutes).zfill(2)}{str(seconds).zfill(2)}"
+                        angles.pop()
+                        angles.pop()
+                        angles.append(total_angle)
+                        for i in angles:
+                            degrees, minutes_seconds = i.split(".")
+                            degrees = int(degrees)
+                            minutes = minutes_seconds[:2]
+                            seconds = minutes_seconds[2:]
+                            print(f": {str(degrees).zfill(2)}\u00B0{str(minutes).zfill(2)}'{str(seconds).zfill(2)}\" ")
+                    else:
+                        break
+                else:
+                    print(" Enter an angle or E to exit")
+                    continue
+
+
+def dms_to_decimal(dms):
+    # converts degrees minutes seconds to decimal degrees
+    dms = str(dms)
+    degrees, minutes_seconds = dms.split(".")
+    degrees = int(degrees)
+    minutes = minutes_seconds[:2]
+    seconds = minutes_seconds[2:]
+    angle_decimal = degrees + int(minutes)/60 + int(seconds)/3600
+    angle_decimal = round(float(angle_decimal), 6)
+    return angle_decimal
+
+
+def decimal_to_dms(decimal):
+    # converts decimal degrees to degrees minutes seconds
+    degrees_dms = int(decimal)
+    dec_min = (decimal - degrees_dms) * 60
+    minutes = int(dec_min)
+    minutes_dms = abs(minutes)
+    seconds_dms = round(abs((dec_min - minutes) * 60))
+    if seconds_dms == 60:
+        minutes_dms += 1
+        seconds_dms = "00"
+        if minutes_dms == 60:
+            degrees_dms += 1
+            minutes_dms = "00"
+    return degrees_dms, minutes_dms, seconds_dms
+
+
+def add_dms(conversion, a, b):
+    return conversion(a) + conversion(b)
+
+
+def subtract_dms(conversion, a, b):
+    return conversion(a) - conversion(b)
+
+
+if __name__ == "__main__":
+    main()
