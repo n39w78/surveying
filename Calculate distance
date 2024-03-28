@@ -1,0 +1,102 @@
+""" This script Calculates the horizontal distance given the
+slope distance and the zenith angle expressed in degrees, minutes, seconds"""
+import math
+
+
+def main():
+    while True:
+        try:
+            slope = float(input("Slope distance: "))
+            break
+        except ValueError:
+            print("Enter a number")
+    zenith = get_angle(angle_type="Zenith")
+    horizontal_distance = calc_dist(dms_to_rad, zenith, slope)
+    print(f"Horizontal Distance = {horizontal_distance:.3f}")
+
+
+def dms_to_rad(dms):
+    """function converts angle degrees minutes seconds to radians"""
+    while True:
+        try:
+            degrees, minutes_seconds = dms.split(".")
+            degrees = int(degrees)
+            minutes = minutes_seconds[:2]
+            seconds = minutes_seconds[2:]
+            angle_decimal = degrees + int(minutes)/60 + int(seconds)/3600
+            angle_radians = math.radians(angle_decimal)
+            return angle_radians
+        except ValueError:
+            print("ddd.mmss")
+            break
+
+
+def get_angle(angle_type):
+    """ The function validates an angle input. The angle is degrees, minutes, seconds
+    entered as ddd.mmss"""
+    while True:
+        try:
+            angle = input(f"{angle_type} angle (ddd.mmss): ")
+            float(angle)
+            if '.' in angle:
+                deg, min_sec = angle.split(".")
+                if int(deg) <= 180:
+                    if len(min_sec) < 1:
+                        degrees = int(deg)
+                        angle = str(degrees) + "." + "0000"
+                        return angle
+                    elif len(min_sec) == 1:
+                        print("Enter two digits for minutes and seconds ddd.mmss")
+                        continue
+                    elif len(min_sec) == 2:
+                        degrees = deg
+                        minutes = min_sec[:2]
+                        angle = degrees + "." + minutes + "00"
+                        return angle
+                    elif len(min_sec) == 3:
+                        print("Enter two digits for seconds ddd.mmss")
+                        continue
+                    elif len(min_sec) == 4:
+                        minutes = min_sec[:2]
+                        seconds = min_sec[2:]
+                        if int(minutes) < 60:
+                            if int(seconds) < 60:
+                                degrees = deg
+                                minutes = min_sec[:2]
+                                seconds = min_sec[2:]
+                                angle = degrees + "." + minutes + seconds
+                                return angle
+                            else:
+                                print("Seconds cannot be more than 59")
+                                continue
+                        else:
+                            print("Minutes cannot be more than 59")
+                            continue
+                    else:
+                        print("Angle cannot have decimal seconds")
+                        continue
+                else:
+                    print("Angle cannot be more than 180 degrees")
+                    continue
+            else:
+                if int(angle) < 180:
+                    degrees = str(angle)
+                    minutes = "00"
+                    seconds = "00"
+                    angle = degrees + "." + minutes + seconds
+                    return angle
+                else:
+                    print("Angle cannot be more than 180 degrees")
+                    continue
+        except ValueError:
+            print("Angle needs to be of this format ddd.mmss")
+            continue
+
+
+def calc_dist(conversion, angle, slope):
+    """calculates the distance."""
+    return math.sin(conversion(angle)) * slope
+
+
+if __name__ == "__main__":
+    main()
